@@ -68,7 +68,8 @@ public:
 // 可写访问接口
     T& operator[](Rank r) const;    // 重载下标操作符
     Vector<T>& operator=(Vector<T> const&); // 重载赋值运算符
-    int remove(Rank r); // 删除秩为r的元素
+    T remove(Rank r); // 删除秩为r的元素
+    int remove(Rank lo, Rank hi);   // 删除区间[lo,hi)内的元素
     Rank insert(Rank r, T const& e);    // 插入元素
     Rank insert(T const& e)
     {

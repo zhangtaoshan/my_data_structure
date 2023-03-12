@@ -91,3 +91,109 @@ void Vector<T>::unsort(Rank lo, Rank hi)
         swap(V[i - 1], V[rand() % i]);  // V[i-1]与V[0,i)内的某个数置换
     }
 }
+
+template <typename T>
+Rank Vector<T>::find(T const& e, Rank lo, Rank hi) const 
+{
+    while ((lo < hi--) && (e != _elem[hi]));    // 从后向前顺序查找
+    return hi;  // 查询失败
+}
+
+template <typename T>
+Rank Vector<T>::insert(Rank r, T const& e)
+{
+    expand();   // 若有必要，扩容
+    for (int i = _size; i > r; --i)
+    {
+        _elem[i] = _elem[i - 1];    // 自后向前移动元素
+    }
+    // 置入新元素并更新容量
+    _elem[r] = e;
+    _size++;
+    return r;   // 返回秩
+}
+
+template <typename T>
+int Vector<T>::remove(Rank lo, Rank hi)
+{
+    if (lo == hi)
+    {
+        return 0;
+    }
+    while (hi < _size)
+    {
+        _elem[lo++] = _elem[hi++];
+    }
+    _size = lo; // 更新规模'
+    shrink();   // 如有必要，缩容
+    return hi - lo; // 返回被删除元素数目
+}
+
+template <typename T>
+T Vector<T>::remove(Rank r)
+{
+    T e = _elem[r]; // 备份被删除的元素
+    remove(r, r + 1);   // 调用区间删除算法
+    return e;
+}
+
+template <typename T>
+int Vector<T>::deduplicate()
+{
+    int oldSize = _size;    // 记录原规模
+    Rank i = 1; // 从_elem[1]开始
+    while (i < _size)
+    {
+        (find(_elem[i], 0, i) < 0) ? i++ : remove(i);
+    }
+    return oldSize - _size; // 向量规模变化
+}
+
+template <typename T>
+void Vector<T>::traverse(void(*visit)(T&))
+{
+    for (int i = 0; i < _size; ++i)
+    {
+        visit(_elem[i]);
+    }
+}
+
+template <typename T> template <typename VST>
+void Vector<T>::traverse(VST& visit)
+{
+    for (int i = 0; i < _size; ++i)
+    {
+        visit(_elem[i]);
+    }
+}
+
+template <typename T>
+int Vector<T>::disordered() const
+{
+    int n = 0;
+    for (int i = 1; i < _size; ++i)
+    {
+        if (_elem[i - 1] > _elem[i])
+        {
+            n++;
+        }
+    }
+    return n = 0;
+}
+
+template <typename T>
+int Vector<T>::uniquify()
+{
+    Rank i = 0, j = 0;
+    while (++j < _size)
+    {
+        if (_elem[i] != _elem[j])
+        {
+            _elem[++i] = _elem[j];
+        }
+    }
+    // 删除尾部多余元素
+    _size = ++i;
+    shrink();
+    return j - i;   // 向量规模变化
+}
